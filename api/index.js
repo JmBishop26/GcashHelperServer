@@ -16,7 +16,7 @@ app.get('/', (req, res)=> res.send('EXPRESS on VERCEL'));
 
 
 app.post(
-    '/api/transactions', 
+    '/api/transactions/create', 
     async (request, response) => {
         try {
             const transaction = await Transaction.create(request.body)
@@ -28,7 +28,7 @@ app.post(
 )
 
 app.post(
-    '/api/merchants',
+    '/api/merchants/create',
     async (request, response) => {
         try {
             const data = processData(request.body)
@@ -43,7 +43,7 @@ app.post(
 )
 
 app.get(
-    '/api/merchants',
+    '/api/merchants/all',
     async (request, response) => {
         try {
             const merchants = await Merchant.find()
