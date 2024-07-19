@@ -42,6 +42,19 @@ app.post(
     }
 )
 
+app.get(
+    '/api/merchants',
+    async (request, response) => {
+        try {
+            const merchants = await Merchant.find()
+            console.log(merchants)
+            response.json(merchants)
+        } catch (error) {
+            response.status(500).json({message: error.message})
+        }
+    }
+)
+
 app.listen(process.env.PORT, ()=>{
     console.log(`running on port ${process.env.PORT}`)
 })
