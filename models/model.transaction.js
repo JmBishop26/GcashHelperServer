@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const Double = mongoose.Schema.Types.Decimal128
 
 const TransactionType = Object.freeze({
     CASH_IN: 'CASH_IN',
@@ -18,12 +17,12 @@ const TransactionSchema = mongoose.Schema(
             required: [true, "Mobile Number is REQUIRED"],
         },
         amount: {
-            type: Double,
+            type: Number,
             required: [true, "Amount is REQUIRED"],
             default: 0.00
         },
         charge: {
-            type: Double,
+            type: Number,
             required: false,
             default: 0.00
         },
