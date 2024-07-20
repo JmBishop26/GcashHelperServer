@@ -4,10 +4,11 @@ const Transaction = require('../models/model.transaction');
 const router = express.Router();
 
 router.get(
-    '/all',
+    '/all/:merchantID',
     async (request, response) => {
         try {
-            const transactions = await Transaction.find()
+            const { merchantID } = request.params
+            const transactions = await Transaction.find({merchantID : merchantID})
             response.status(200).json({code: "SUC20000", message: "Fetched Successfully!", data: transactions})
         } catch (error) {
             response.status(500).json({code: "ERR50000", message: error.message, data: null})
