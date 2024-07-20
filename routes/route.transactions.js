@@ -1,6 +1,7 @@
 const express = require('express');
 const Transaction = require('../models/model.transaction');
-
+const moment = require('moment');
+const { processTransaction } = require('../helper/utils');
 const router = express.Router();
 
 router.get(
@@ -8,8 +9,14 @@ router.get(
     async (request, response) => {
         try {
             const { merchantID } = request.params
-            const transactions = await Transaction.find({merchantID : merchantID})
-            response.status(200).json({code: "SUC20000", message: "Fetched Successfully!", data: transactions})
+            const start = moment().startOf('day').toDate();
+            const end = moment().endOf('day').toDate();
+
+            const transactions = await Transaction.find({merchantID : merchantID, createdAt: { $gte: start, $lt: end }})
+            
+            const {subTotal, grandTotal} = processTransaction(transactions)
+
+            response.status(200).json({code: "SUC20000", message: "Fetched Successfully!", data: { date: end, subTotal: subTotal, grandTotal: grandTotal, transactions: transactions}})
         } catch (error) {
             response.status(500).json({code: "ERR50000", message: error.message, data: null})
         }

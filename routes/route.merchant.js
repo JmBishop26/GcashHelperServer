@@ -1,6 +1,6 @@
 const express = require('express');
 const Merchant = require('../models/model.merchant');
-const { processData } = require('../helper/utils');
+const { nicknameToUpper } = require('../helper/utils');
 
 const router = express.Router();
 
@@ -8,7 +8,7 @@ router.post(
     '/create', 
     async (request, response) => {
         try {
-            const data = processData(request.body)
+            const data = nicknameToUpper(request.body)
 
             const merchant = await Merchant.create(data)
             response.status(200).json({code: "SUC20000", message: "Created Successfully!", data: merchant})
