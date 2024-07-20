@@ -14,8 +14,13 @@ function processTransaction(data){
     var grandTotal = 0;
 
     data.forEach(element => {
-        subTotal += parseFloat(element.amount.toFixed(2))
+        if(element.type === "CASH_OUT"){
+            subTotal -= parseFloat(element.amount.toFixed(2))
+        }else{
+            subTotal += parseFloat(element.amount.toFixed(2))
+        }
         charge += parseFloat(element.charge.toFixed(2))
+        
     });
     
     grandTotal = parseFloat((subTotal + charge).toFixed(2))
