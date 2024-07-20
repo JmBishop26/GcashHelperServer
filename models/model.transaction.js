@@ -30,6 +30,10 @@ const TransactionSchema = mongoose.Schema(
             type: String,
             enum: Object.values(TransactionType),
             required: [true, "Transaction Type is REQUIRED"],
+        },
+        merchantID: {
+            type: String,
+            required: [true, "Merchant ID is REQUIRED"],
         }
     },
     { 
