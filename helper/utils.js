@@ -21,7 +21,7 @@ function processTransaction(data){
     grandTotal = parseFloat((subTotal + charge).toFixed(2))
 
 
-    return { subTotal: subTotal, grandTotal: grandTotal }
+    return { subTotal: subTotal, charge: charge, grandTotal: grandTotal }
 }
 
 module.exports = { nicknameToUpper, processTransaction }

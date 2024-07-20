@@ -14,9 +14,9 @@ router.get(
 
             const transactions = await Transaction.find({merchantID : merchantID, createdAt: { $gte: start, $lt: end }})
             
-            const {subTotal, grandTotal} = processTransaction(transactions)
+            const {subTotal, charge, grandTotal} = processTransaction(transactions)
 
-            response.status(200).json({code: "SUC20000", message: "Fetched Successfully!", data: { date: end, subTotal: subTotal, grandTotal: grandTotal, transactions: transactions}})
+            response.status(200).json({code: "SUC20000", message: "Fetched Successfully!", data: { date: end, amountDetails: {subTotal: subTotal, charge: charge, grandTotal: grandTotal}, transactions: transactions}})
         } catch (error) {
             response.status(500).json({code: "ERR50000", message: error.message, data: null})
         }
