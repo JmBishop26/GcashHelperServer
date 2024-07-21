@@ -1,3 +1,4 @@
+const moment = require('moment');
 
 function nicknameToUpper(data) {
     var cloneData = { ...data }
@@ -29,4 +30,12 @@ function processTransaction(data){
     return { subTotal: subTotal, charges: charges, grandTotal: grandTotal }
 }
 
-module.exports = { nicknameToUpper, processTransaction }
+function dateFormatter(value){
+
+    const date = moment.utc(value, "YYYY-MM-DD");
+    date.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+
+    return date.toISOString()
+}
+
+module.exports = { nicknameToUpper, processTransaction, dateFormatter }

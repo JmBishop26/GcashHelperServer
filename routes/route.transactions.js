@@ -1,7 +1,7 @@
 const express = require('express');
 const {Transaction, TransactionType} = require('../models/model.transaction');
 const moment = require('moment');
-const { processTransaction } = require('../helper/utils');
+const { processTransaction, dateFormatter } = require('../helper/utils');
 const router = express.Router();
 
 router.get(
@@ -18,7 +18,7 @@ router.get(
                         $expr: {
                             $eq: [
                                 {
-                                    $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
+                                    $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "UTC" }
                                 },
                                 date
                             ]
@@ -29,7 +29,7 @@ router.get(
             
             const {subTotal, charges, grandTotal} = processTransaction(transactions)
 
-            response.status(200).json({code: "SUC20000", message: "Fetched Successfully!", data: { date: date, amountDetails: {subTotal: subTotal, charges: charges, grandTotal: grandTotal}, transactions: transactions}})
+            response.status(200).json({code: "SUC20000", message: "Fetched Successfully!", data: { date: dateFormatter(date), amountDetails: {subTotal: subTotal, charges: charges, grandTotal: grandTotal}, transactions: transactions}})
         } catch (error) {
             response.status(500).json({code: "ERR50000", message: error.message, data: null})
         }
@@ -53,8 +53,9 @@ router.get(
                     $group: {
                         _id: {
                             $dateToString: { 
-                                format: "%Y-%m-%d",
+                                format: "%Y-%m-%dT00:00.000Z",
                                 date: "$createdAt",
+                                timezone: "UTC"
                             }
                         },
                         subTotal: {
