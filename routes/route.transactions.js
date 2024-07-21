@@ -57,7 +57,7 @@ router.get(
                     $group: {
                         _id: {
                             $dateToString: { 
-                                format: "%Y-%m-%dT00:00.000Z",
+                                format: "%Y-%m-%dT00:00:00.000Z",
                                 date: "$createdAt",
                                 timezone: "UTC"
                             }
