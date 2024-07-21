@@ -10,7 +10,7 @@ function nicknameToUpper(data) {
 
 function processTransaction(data){
     var subTotal  = 0;
-    var charge  = 0;
+    var charges  = 0;
     var grandTotal = 0;
 
     data.forEach(element => {
@@ -19,14 +19,14 @@ function processTransaction(data){
         }else{
             subTotal += parseFloat(element.amount.toFixed(2))
         }
-        charge += parseFloat(element.charge.toFixed(2))
+        charges += parseFloat(element.charge.toFixed(2))
         
     });
     
-    grandTotal = parseFloat((subTotal + charge).toFixed(2))
+    grandTotal = parseFloat((subTotal + charges).toFixed(2))
 
 
-    return { subTotal: subTotal, charge: charge, grandTotal: grandTotal }
+    return { subTotal: subTotal, charges: charges, grandTotal: grandTotal }
 }
 
 module.exports = { nicknameToUpper, processTransaction }

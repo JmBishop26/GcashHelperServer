@@ -1,5 +1,5 @@
 const express = require('express');
-const Transaction = require('../models/model.transaction');
+const {Transaction, TransactionType} = require('../models/model.transaction');
 const moment = require('moment');
 const { processTransaction } = require('../helper/utils');
 const router = express.Router();
@@ -9,14 +9,86 @@ router.get(
     async (request, response) => {
         try {
             const { merchantID } = request.params
-            const start = moment().startOf('day').toDate();
-            const end = moment().endOf('day').toDate();
+            const date = request.query.date
 
-            const transactions = await Transaction.find({merchantID : merchantID, createdAt: { $gte: start, $lt: end }})
+            const transactions = await Transaction.aggregate([
+                {
+                    $match: { 
+                        merchantID: merchantID,
+                        $expr: {
+                            $eq: [
+                                {
+                                    $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
+                                },
+                                date
+                            ]
+                        }
+                    }
+                }
+            ])
             
-            const {subTotal, charge, grandTotal} = processTransaction(transactions)
+            const {subTotal, charges, grandTotal} = processTransaction(transactions)
 
-            response.status(200).json({code: "SUC20000", message: "Fetched Successfully!", data: { date: end, amountDetails: {subTotal: subTotal, charge: charge, grandTotal: grandTotal}, transactions: transactions}})
+            response.status(200).json({code: "SUC20000", message: "Fetched Successfully!", data: { date: date, amountDetails: {subTotal: subTotal, charges: charges, grandTotal: grandTotal}, transactions: transactions}})
+        } catch (error) {
+            response.status(500).json({code: "ERR50000", message: error.message, data: null})
+        }
+    }
+)
+
+router.get(
+    '/all/history/:merchantID',
+    async (request, response) => {
+        try { 
+
+            const { merchantID } = request.params
+
+            const transactions = await Transaction.aggregate([
+                {
+                    $match: { 
+                        merchantID: merchantID
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            $dateToString: { 
+                                format: "%Y-%m-%d",
+                                date: "$createdAt",
+                            }
+                        },
+                        subTotal: {
+                            $sum: {
+                                $cond: {
+                                    if: { $or: [ { $eq: ["$type", TransactionType.CASH_IN] }, { $eq: ["$type", TransactionType.LOAD] } ] },
+                                    then: "$amount",
+                                    else: { $subtract: [0, "$amount"] }
+                                }
+                            }
+                        },
+                        charges: {
+                            $sum : "$charge"
+                        },
+                        transactions: { $push: "$$ROOT" }
+                    }
+                },
+                {
+                    $project: {
+                        amountDetails: {
+                            subTotal: "$subTotal",
+                            charges: "$charge",
+                            grandTotal: { $add: ["$subTotal", "$charge"] }
+                        },
+                        transactions: 1
+                    }
+                },
+                {
+                    $sort: { _id: -1 }
+                }
+            ]);
+    
+            response.status(200).json({ code: "SUC20000", message: "Fetched Successfully!", data: transactions });
+
         } catch (error) {
             response.status(500).json({code: "ERR50000", message: error.message, data: null})
         }
