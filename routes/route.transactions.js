@@ -42,11 +42,15 @@ router.get(
         try { 
 
             const { merchantID } = request.params
+            const date = moment().startOf("day").toDate()
 
             const transactions = await Transaction.aggregate([
                 {
                     $match: { 
-                        merchantID: merchantID
+                        merchantID: merchantID,
+                        createdAt: {
+                            $lt: date
+                        }
                     }
                 },
                 {
