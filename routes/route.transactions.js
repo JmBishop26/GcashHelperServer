@@ -79,6 +79,7 @@ router.get(
                 },
                 {
                     $project: {
+                        date: "$_id",
                         amountDetails: {
                             subTotal: "$subTotal",
                             charges: "$charge",
