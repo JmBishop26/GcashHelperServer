@@ -82,8 +82,8 @@ router.get(
                         date: "$_id",
                         amountDetails: {
                             subTotal: "$subTotal",
-                            charges: "$charge",
-                            grandTotal: { $add: ["$subTotal", "$charge"] }
+                            charges: "$charges",
+                            grandTotal: { $add: ["$subTotal", "$charges"] }
                         },
                         transactions: 1
                     }
