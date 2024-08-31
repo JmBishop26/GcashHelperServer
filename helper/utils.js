@@ -167,7 +167,7 @@ function generateInvoice(data){
               },
             },
             {
-              col1: 'SubTotal:',
+              col1: 'Sub Total:',
               col2: `Php ${ toMoneyFormat(subTotal) }`,
               style: {
                 fontSize: 10, // optional, default 12
@@ -181,9 +181,8 @@ function generateInvoice(data){
     
     const doc = jsPDFInvoiceTemplate.default(props).jsPDFDocObject;
 
-    const baseDir = path.resolve(__dirname, '../');
     const fileName = `transaction_report_${date}.pdf`;
-    const pdfDir = path.join(baseDir, 'tmp', 'records');
+    const pdfDir = path.join(process.cwd(), 'tmp', 'records');
     const pdfPath = path.join(pdfDir, fileName);
 
     if (!fs.existsSync(pdfDir)) {
