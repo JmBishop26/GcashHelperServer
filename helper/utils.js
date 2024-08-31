@@ -182,7 +182,7 @@ function generateInvoice(data){
     const doc = jsPDFInvoiceTemplate.default(props).jsPDFDocObject;
 
     const fileName = `transaction_report_${date}.pdf`;
-    const pdfDir = path.join('api', 'tmp', 'records');
+    const pdfDir = path.join(process.cwd(), 'api', 'tmp', 'records');
     const pdfPath = path.join(pdfDir, fileName);
 
     if (!fs.existsSync(pdfDir)) {

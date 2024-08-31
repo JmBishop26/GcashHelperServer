@@ -155,7 +155,7 @@ router.get(
             }
 
             const fileName = await generateInvoice(pdfData)
-            const url = `${request.protocol}://${request.get('host')}/tmp/records/${fileName}`
+            const url = `${request.protocol}://${request.get('host')}/api/tmp/records/${fileName}`
 
             response.status(200).json({code: "SUC20000", message: "File generated successfully!", data: { url: url }})
         } catch (error) {
