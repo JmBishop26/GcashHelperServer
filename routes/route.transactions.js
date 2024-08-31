@@ -154,7 +154,7 @@ router.get(
                 grandTotal
             }
 
-            const fileName = generateInvoice(pdfData)
+            const fileName = await generateInvoice(pdfData)
             const url = `${request.protocol}://${request.get('host')}/tmp/records/${fileName}`
 
             response.status(200).json({code: "SUC20000", message: "File generated successfully!", data: { url: url }})
