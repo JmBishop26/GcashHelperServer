@@ -1,7 +1,8 @@
 const express = require('express');
 const {Transaction, TransactionType} = require('../models/model.transaction');
 const moment = require('moment');
-const { processTransaction, dateFormatter } = require('../helper/utils');
+const { processTransaction, dateFormatter, fetchData, generatePdf, generateInvoice } = require('../helper/utils');
+const Merchant = require('../models/model.merchant');
 const router = express.Router();
 
 router.get(
@@ -11,21 +12,7 @@ router.get(
             const { merchantID } = request.params
             const date = request.query.date
 
-            const transactions = await Transaction.aggregate([
-                {
-                    $match: { 
-                        merchantID: merchantID,
-                        $expr: {
-                            $eq: [
-                                {
-                                    $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "UTC" }
-                                },
-                                date
-                            ]
-                        }
-                    }
-                }
-            ])
+            const transactions = await fetchData(merchantID, date)
             
             const {subTotal, charges, grandTotal} = processTransaction(transactions)
 
@@ -145,5 +132,38 @@ router.put(
         }
     }
 )
+
+router.get(
+    '/generate-pdf/:merchantID',
+    async(request, response) => {
+        try {
+            const { merchantID } = request.params
+            const date = request.query.date
+
+            const transactions = await fetchData(merchantID, date)
+            const merchant = await Merchant.findById(merchantID)
+            
+            const {subTotal, charges, grandTotal} = processTransaction(transactions)
+            
+            const pdfData = {
+                date,
+                transactions,
+                merchant,
+                subTotal,
+                charges,
+                grandTotal
+            }
+
+            const fileName = generateInvoice(pdfData)
+            const url = `${request.protocol}://${request.get('host')}/pdfs/${fileName}`
+
+            response.status(200).json({code: "SUC20000", message: "File generated successfully!", data: { url: url }})
+        } catch (error) {
+            response.status(500).json({code: "ERR50000", message: error.message, data: null})
+        }
+    } 
+)
+
+
 
 module.exports = router;
