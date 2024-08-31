@@ -145,32 +145,32 @@ function generateInvoice(data){
             { title: 'Charge' },
           ],
           table: transactions.map((transaction, index) => [
-            index + 1, // Index as the first column
-            transaction.name, // Name of the person or entity
-            transactionType(transaction.type), // Transaction details
-            `Php ${ toMoneyFormat(transaction.amount) }`, // Amount
-            `Php ${ toMoneyFormat(transaction.charge) }`, // Charge
+            index + 1,
+            transaction.name,
+            transactionType(transaction.type),
+            `Php ${ toMoneyFormat(transaction.amount) }`,
+            `Php ${ toMoneyFormat(transaction.charge) }`,
           ]),
           additionalRows: [
             {
               col1: 'Grand Total:',
               col2: `Php ${ toMoneyFormat(grandTotal) }`,
               style: {
-                fontSize: 12, // optional, default 12
+                fontSize: 12,
               },
             },
             {
               col1: 'Charges:',
               col2: `Php ${ toMoneyFormat(charges) }`,
               style: {
-                fontSize: 10, // optional, default 12
+                fontSize: 10,
               },
             },
             {
               col1: 'Sub Total:',
               col2: `Php ${ toMoneyFormat(subTotal) }`,
               style: {
-                fontSize: 10, // optional, default 12
+                fontSize: 10,
               },
             },
           ],
@@ -182,7 +182,7 @@ function generateInvoice(data){
     const doc = jsPDFInvoiceTemplate.default(props).jsPDFDocObject;
 
     const fileName = `transaction_report_${date}.pdf`;
-    const pdfDir = path.join(process.cwd(), 'tmp', 'records');
+    const pdfDir = path.join('tmp', 'records');
     const pdfPath = path.join(pdfDir, fileName);
 
     if (!fs.existsSync(pdfDir)) {
