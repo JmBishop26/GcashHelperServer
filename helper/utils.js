@@ -183,7 +183,7 @@ function generateInvoice(data){
 
     const baseDir = path.resolve(__dirname, '../');
     const fileName = `transaction_report_${date}.pdf`;
-    const pdfDir = path.join(baseDir, 'records');
+    const pdfDir = path.join(baseDir, 'public', 'records');
     const pdfPath = path.join(pdfDir, fileName);
 
     if (!fs.existsSync(pdfDir)) {
