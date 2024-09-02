@@ -6,9 +6,7 @@ const connectDB = require('../mongodb/connection');
 
 const app = express();
 const merchantsRoute = require('../routes/route.merchant')
-const transactionsRoute = require('../routes/route.transactions')
-
-app.use('/pdfs', express.static(path.join(__dirname, 'pdfs')));
+const transactionsRoute = require('../routes/route.transactions');
 
 require('dotenv').config();
 
@@ -23,6 +21,6 @@ app.use('/api/transactions', transactionsRoute)
 app.use('/api/merchants', merchantsRoute)
 
 
-app.listen(process.env.PORT, ()=>{
+app.listen(process.env.PORT, () => {
     console.log(`running on port ${process.env.PORT}`)
 })

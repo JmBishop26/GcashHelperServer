@@ -6,6 +6,8 @@ const jsPDFInvoiceTemplate = require('jspdf-invoice-template-nodejs');
 
 const { Transaction } = require('../models/model.transaction');
 const { buildHeading, createTable, createHeaders, toMoneyFormat, formatDate } = require('./pdf');
+const { getDownloadURL, uploadBytes, ref } = require('firebase/storage');
+const { storage } = require('../configs/firebase');
 
 function nicknameToUpper(data) {
     var cloneData = { ...data }
@@ -66,59 +68,13 @@ async function fetchData(merchantID, date){
     return transactions
 }
 
-async function generatePdf(data){
 
-    const { date, transactions, merchant, subTotal, charges, grandTotal } = data
-
-    const doc = new jsPDF({
-        orientation: "portrait",
-      });
-    
-    buildHeading(doc, data)
-
-    var header = createHeaders([
-        "name",
-        "transaction",
-        "amount",
-        "charge",
-    ])
-
-    var generateData = function(amount) {
-        var result = [];
-        var data = {
-          name: "100",
-          transaction: "GameGroup",
-          amount: "XPTO2",
-          charge: "25",
-        };
-        for (var i = 0; i < amount; i += 1) {
-          data.id = (i + 1).toString();
-          result.push(Object.assign({}, data));
-        }
-        return result;
-      };
-
-    doc.table(60, 10, generateData(10), header, { autoSize: true})
-
-    // Define a filename and path for the PDF
-    const baseDir = path.resolve(__dirname, '../');
-    const fileName = `transaction_report_${date}.pdf`;
-    const pdfDir = path.join(baseDir, 'pdfs');
-    const pdfPath = path.join(pdfDir, fileName);
-
-    // Save the PDF to the server
-    const pdfOutput = doc.output('arraybuffer');
-    fs.writeFileSync(pdfPath, Buffer.from(pdfOutput));
-
-    return fileName
-}
-
-function generateInvoice(data){
+async function generateInvoice(data){
     const { date, transactions, merchant, subTotal, charges, grandTotal } = data
 
     const props = {
-        outputType: 'save', // This will be overridden by custom handling below
-        returnJsPDFDocObject: true, // Return the jsPDF object for further handling
+        outputType: 'save',
+        returnJsPDFDocObject: true,
         fileName: `transaction_report_${date}.pdf`,
         orientationLandscape: false,
         compress: true,
@@ -181,18 +137,16 @@ function generateInvoice(data){
     
     const doc = jsPDFInvoiceTemplate.default(props).jsPDFDocObject;
 
-    const fileName = `transaction_report_${date}.pdf`;
-    const pdfDir = path.join(process.cwd(), 'api', 'tmp', 'records');
-    const pdfPath = path.join(pdfDir, fileName);
+    const pdfOutput = doc.output('arraybuffer')
 
-    if (!fs.existsSync(pdfDir)) {
-      fs.mkdirSync(pdfDir, { recursive: true });
-    }
+    const pdfBuffer = Buffer.from(pdfOutput)
 
-    const pdfOutput = doc.output('arraybuffer');
-    fs.writeFileSync(pdfPath, Buffer.from(pdfOutput));
-    
-    return fileName
+    const fileName = `transaction_report_${date}.pdf`
+    const storageRef = ref(storage, `pdfs/${fileName}`)
+
+    const url = upload(storageRef, pdfBuffer)
+
+    return url
 }
 
 function transactionType(type){
@@ -227,5 +181,16 @@ function formattedToday(){
     return `${month}/${day}/${year} ${hours}:${minutes}`;
 }
 
+async function upload(storageRef, pdfBuffer){
+  try {
+    const uploadResult = await uploadBytes(storageRef, pdfBuffer, { contentType: 'application/pdf' })
 
-module.exports = { nicknameToUpper, processTransaction, dateFormatter, fetchData, generatePdf, createHeaders, generateInvoice }
+    const downloadURL = await getDownloadURL(uploadResult.ref)
+    
+    return downloadURL
+  } catch (error) {
+    throw error
+  }
+}
+
+module.exports = { nicknameToUpper, processTransaction, dateFormatter, fetchData, createHeaders, generateInvoice }

@@ -1,7 +1,7 @@
 const express = require('express');
 const {Transaction, TransactionType} = require('../models/model.transaction');
 const moment = require('moment');
-const { processTransaction, dateFormatter, fetchData, generatePdf, generateInvoice } = require('../helper/utils');
+const { processTransaction, dateFormatter, fetchData, generateInvoice } = require('../helper/utils');
 const Merchant = require('../models/model.merchant');
 const router = express.Router();
 
@@ -154,8 +154,7 @@ router.get(
                 grandTotal
             }
 
-            const fileName = await generateInvoice(pdfData)
-            const url = `${request.protocol}://${request.get('host')}/api/tmp/records/${fileName}`
+            const url = await generateInvoice(pdfData)
 
             response.status(200).json({code: "SUC20000", message: "File generated successfully!", data: { url: url }})
         } catch (error) {
