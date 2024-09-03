@@ -7,6 +7,7 @@ const connectDB = require('../mongodb/connection');
 const app = express();
 const merchantsRoute = require('../routes/route.merchant')
 const transactionsRoute = require('../routes/route.transactions');
+const chargesRouter = require('../routes/router.charges')
 
 require('dotenv').config();
 
@@ -19,6 +20,8 @@ app.use('/api/transactions', transactionsRoute)
 
 //merchants
 app.use('/api/merchants', merchantsRoute)
+
+app.use('/api/charges', chargesRouter)
 
 
 app.listen(process.env.PORT, () => {
